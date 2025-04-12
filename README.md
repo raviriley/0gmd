@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 0GMD: Secure Healthcare Records on the Blockchain
+
+0GMD is a modern web application that empowers users to securely control their healthcare records. By leveraging blockchain technology, 0GMD provides a private and secure way to store and manage medical information.
+
+## Key Features
+
+- **Encrypted Medical Records**: Your healthcare data is encrypted and stored on the blockchain, ensuring complete privacy and security.
+- **AI Health Assistant**: A sophisticated chatbot that can access and interpret your secured medical records to provide personalized health information.
+- **Doctor Record Requests**: Manage requests from healthcare providers who need access to your records, maintaining control over who sees your information.
+- **Medical Records Dashboard**: Easily view, organize, and manage all your health records in one place.
+- **Secure File Upload**: Upload medical files directly to the blockchain with end-to-end encryption using 0G storage.
+
+## Technology Stack
+
+- **Next.js 15**: Modern React framework with App Router
+- **React 19**: Latest React version for building the UI
+- **Tailwind CSS**: Utility-first CSS framework for styling
+- **0G Storage**: Decentralized storage solution for secure blockchain storage
+- **Ethers.js**: Ethereum library for blockchain interactions
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/raviriley/0gmd.git
+cd 0gmd
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up environment variables:
 
-## Learn More
+Create a `.env` file based on the `.env.example` with your 0G Storage and blockchain configuration:
 
-To learn more about Next.js, take a look at the following resources:
+```
+OPENROUTER_API_KEY=
+ZERO_G_STORAGE_RPC=https://evmrpc-testnet.0g.ai
+ZERO_G_L1_RPC=https://evmrpc-testnet.0g.ai
+ZERO_G_PRIVATE_KEY=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Run the development server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## How It Works
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **User Authentication**: Securely log in to access your personal health dashboard.
+2. **Upload Medical Records**: Upload your medical documents securely to the blockchain.
+3. **Grant Access**: Control which healthcare providers can access specific records.
+4. **AI Assistance**: Get personalized health insights from the AI assistant that can securely access your encrypted records.
+
+## Security & Privacy
+
+0GMD prioritizes your privacy:
+
+- All medical records are encrypted before being stored on the blockchain
+- You maintain complete control over who can access your records
+- No third parties can access your data without explicit permission
+- Blockchain technology ensures immutability and auditability of all data access
