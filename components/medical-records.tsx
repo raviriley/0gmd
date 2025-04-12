@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 export function MedicalRecords() {
   return (
-    <Card className="mb-8">
+    <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Medical Records</CardTitle>

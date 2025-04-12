@@ -69,7 +69,7 @@ export function AICopilotSidebar() {
   };
 
   return (
-    <Sidebar side="right" className="border-l">
+    <Sidebar side="left" variant="inset">
       <SidebarHeader className="p-4 border-b">
         <div className="flex items-center">
           <Sparkles className="h-5 w-5 text-primary" />
@@ -97,7 +97,7 @@ export function AICopilotSidebar() {
                   className={`p-3 rounded-lg max-w-[80%] ${
                     message.role === "user"
                       ? "bg-primary text-primary-foreground rounded-tr-none"
-                      : "bg-secondary text-secondary-foreground rounded-tl-none"
+                      : "bg-background text-secondary-foreground rounded-tl-none"
                   }`}
                 >
                   {message.content}
