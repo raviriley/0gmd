@@ -13,7 +13,7 @@ const queryClient = new QueryClient();
 // Prepare wagmi+rainbowkit config
 const config = getDefaultConfig({
   appName: "0G MD",
-  projectId: "YOUR_PROJECT_ID", // Replace with your WalletConnect project ID
+  projectId: "test",
   chains: [zeroG as any],
 });
 
