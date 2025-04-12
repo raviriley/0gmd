@@ -17,7 +17,7 @@ import { useDropzone } from "react-dropzone";
 
 type Message = {
   id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: Date;
   files?: File[];
@@ -35,6 +35,7 @@ export function AICopilotSidebar() {
   ]);
   const [input, setInput] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
@@ -56,7 +57,7 @@ export function AICopilotSidebar() {
     setUploadedFiles(newFiles);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!input.trim() && uploadedFiles.length === 0) return;
 
     // Add user message
@@ -71,9 +72,68 @@ export function AICopilotSidebar() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setUploadedFiles([]);
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Prepare messages for API
+      const apiMessages = messages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      }));
+
+      // Add system message
+      apiMessages.unshift({
+        role: "system",
+        content: `You are a healthcare assistant called 0G MD. Here's some health data for the patient:
+          - Heart Rate: 72 bpm (Normal range, trend: stable)
+          - Blood Pressure: 120/80 mmHg (Optimal, trend: improving)
+          - Temperature: 98.6°F (Normal, trend: stable)
+          - Glucose Level: 95 mg/dL (Fasting, trend: stable)
+          - Weight: 145 lbs (BMI: 22.5, trend: improving)
+          - Cholesterol: 180 mg/dL (Total, trend: needs attention)
+          
+          Provide helpful, accurate information based on this health data. Be friendly and supportive.`,
+      });
+
+      // Add the new user message
+      apiMessages.push({
+        role: "user",
+        content: input,
+      });
+
+      // Call our backend API route
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: apiMessages,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const aiResponse =
+        data.choices[0]?.message?.content ||
+        "I'm sorry, I couldn't process that request.";
+
+      // Add AI response
+      const aiMessage: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: aiResponse,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error calling chat API:", error);
+
+      // Fallback to hardcoded responses if API fails
       const responses = [
         "Based on your recent lab results, your cholesterol levels have improved since your last test.",
         "Your next appointment with Dr. Johnson is scheduled for April 10th at 2:00 PM.",
@@ -91,7 +151,9 @@ export function AICopilotSidebar() {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-    }, 1000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -163,6 +225,31 @@ export function AICopilotSidebar() {
                   )}
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex w-full gap-3 justify-start">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      <Bot className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="p-3 rounded-lg max-w-[80%] bg-background text-secondary-foreground rounded-tl-none">
+                    <div className="flex space-x-2">
+                      <div
+                        className="w-2 h-2 rounded-full bg-primary animate-bounce"
+                        style={{ animationDelay: "0ms" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 rounded-full bg-primary animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 rounded-full bg-primary animate-bounce"
+                        style={{ animationDelay: "600ms" }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
         </SidebarContent>
@@ -204,17 +291,19 @@ export function AICopilotSidebar() {
                 }}
                 className="flex-1 shadow shadow-2xl hover:shadow-none hover:border-primary"
                 onClick={(e) => e.stopPropagation()}
+                disabled={isLoading}
               />
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   const fileInput = document.querySelector(
-                    'input[type="file"]',
+                    'input[type="file"]'
                   ) as HTMLInputElement;
                   if (fileInput) fileInput.click();
                 }}
                 size="icon"
                 variant="outline"
+                disabled={isLoading}
               >
                 <Paperclip className="h-4 w-4" />
                 <span className="sr-only">Upload file</span>
@@ -225,6 +314,7 @@ export function AICopilotSidebar() {
                   handleSendMessage();
                 }}
                 size="icon"
+                disabled={isLoading}
               >
                 <Send className="h-4 w-4" />
                 <span className="sr-only">Send</span>
