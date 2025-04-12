@@ -4,6 +4,7 @@ import { MedicalRecords } from "@/components/medical-records";
 import { AICopilotSidebar } from "@/components/ai-copilot-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DoctorRecordRequests } from "@/components/doctor-record-requests";
 
 export default function Dashboard() {
   return (
@@ -25,6 +26,7 @@ export default function Dashboard() {
         </header>
         <div className="container px-4 pb-6 pt-3">
           <HealthStatistics />
+          <DoctorRecordRequests />
           <MedicalRecords />
         </div>
       </SidebarInset>

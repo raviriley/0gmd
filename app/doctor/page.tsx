@@ -1,6 +1,5 @@
 import { DoctorHeader } from "@/components/doctor-header";
 import { PatientList } from "@/components/patient-list";
-import { PatientRecordRequests } from "@/components/patient-record-requests";
 import { AICopilotSidebar } from "@/components/ai-copilot-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -19,7 +18,6 @@ export default function DoctorDashboard() {
           </div>
         </header>
         <div className="container px-4 pb-6 pt-3">
-          <PatientRecordRequests />
           <PatientList />
         </div>
       </SidebarInset>

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export function PatientRecordRequests() {
+export function DoctorRecordRequests() {
   return (
     <Card className="mb-8">
       <CardHeader>
@@ -77,8 +77,8 @@ export function PatientRecordRequests() {
 
 interface RecordRequest {
   id: string;
-  patientName: string;
-  patientId: string;
+  doctorName: string;
+  doctorId: string;
   requestType: string;
   requestedDate: string;
   description: string;
@@ -109,18 +109,18 @@ function RequestItem({ request }: RequestItemProps) {
         <Avatar className="h-10 w-10">
           <AvatarImage
             src="/placeholder.svg?height=40&width=40"
-            alt={request.patientName}
+            alt={request.doctorName}
           />
-          <AvatarFallback>{request.patientName.charAt(0)}</AvatarFallback>
+          <AvatarFallback>{request.doctorName.charAt(0)}</AvatarFallback>
         </Avatar>
         <div>
-          <h3 className="font-medium">{request.patientName}</h3>
+          <h3 className="font-medium">{request.doctorName}</h3>
           <div className="flex gap-3 text-sm text-gray-500 dark:text-gray-400">
             <span>{request.requestType}</span>
             <span>•</span>
             <span>{request.requestedDate}</span>
             <span>•</span>
-            <span>Patient ID: {request.patientId}</span>
+            <span>Doctor ID: {request.doctorId}</span>
           </div>
           <p className="text-sm text-gray-600 mt-1">{request.description}</p>
         </div>
@@ -164,8 +164,8 @@ function RequestItem({ request }: RequestItemProps) {
 const recordRequests: RecordRequest[] = [
   {
     id: "1",
-    patientName: "Jane Doe",
-    patientId: "P1001",
+    doctorName: "Dr. Gregory House, MD",
+    doctorId: "D1001",
     requestType: "Lab Results",
     requestedDate: "April 2, 2025",
     description: "Request for blood test results from March 15, 2025",
@@ -174,8 +174,8 @@ const recordRequests: RecordRequest[] = [
   },
   {
     id: "2",
-    patientName: "John Smith",
-    patientId: "P1002",
+    doctorName: "Dr. Meredith Grey, MD",
+    doctorId: "D1002",
     requestType: "Imaging",
     requestedDate: "April 1, 2025",
     description: "Chest X-ray results from recent hospital visit",
@@ -184,8 +184,8 @@ const recordRequests: RecordRequest[] = [
   },
   {
     id: "3",
-    patientName: "Emily Johnson",
-    patientId: "P1003",
+    doctorName: "Dr. Emily Johnson, MD, PhD",
+    doctorId: "D1003",
     requestType: "Prescription",
     requestedDate: "March 30, 2025",
     description: "Refill request for asthma medication",
@@ -194,8 +194,8 @@ const recordRequests: RecordRequest[] = [
   },
   {
     id: "4",
-    patientName: "Michael Chen",
-    patientId: "P1004",
+    doctorName: "Dr. Doogie Howser, MD, PhD",
+    doctorId: "D1004",
     requestType: "Visit Notes",
     requestedDate: "March 28, 2025",
     description: "Copy of physician notes from annual physical",
@@ -204,8 +204,8 @@ const recordRequests: RecordRequest[] = [
   },
   {
     id: "5",
-    patientName: "Sarah Williams",
-    patientId: "P1005",
+    doctorName: "Dr. Sarah Williams, MD, PhD",
+    doctorId: "D1005",
     requestType: "Lab Results",
     requestedDate: "March 25, 2025",
     description: "Request for genetic testing results",
