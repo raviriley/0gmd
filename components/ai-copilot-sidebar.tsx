@@ -14,6 +14,7 @@ import { Bot, Send, User, Sparkles, Paperclip, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDropzone } from "react-dropzone";
+import Markdown from "react-markdown";
 
 type Message = {
   id: string;
@@ -195,7 +196,7 @@ export function AICopilotSidebar() {
                         : "bg-background text-secondary-foreground rounded-tl-none"
                     }`}
                   >
-                    {message.content}
+                    <Markdown>{message.content}</Markdown>
 
                     {message.files && message.files.length > 0 && (
                       <div className="mt-2 space-y-1">
