@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DoctorRecordRequests } from "@/components/doctor-record-requests";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FileUploadDialog } from "@/components/file-upload-dialog";
 
 export default function Dashboard() {
   return (
@@ -22,7 +23,10 @@ export default function Dashboard() {
             /> */}
               <DashboardHeader />
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <FileUploadDialog />
+              <ThemeToggle />
+            </div>
           </div>
         </header>
         <ScrollArea className="h-[calc(100%-76px)] mr-[-8px] pr-[8px]">
