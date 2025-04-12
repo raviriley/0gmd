@@ -25,7 +25,7 @@ export default function Dashboard() {
             <ThemeToggle />
           </div>
         </header>
-        <ScrollArea className="h-[calc(100%-76px)]">
+        <ScrollArea className="h-[calc(100%-76px)] mr-[-8px] pr-[8px]">
           <div className="container px-4 pb-6 pt-3">
             <HealthStatistics />
             <DoctorRecordRequests />
