@@ -7,6 +7,7 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Dashboard() {
   return (
@@ -16,11 +17,14 @@ export default function Dashboard() {
           <div className="container mx-auto px-4 pb-6 pt-3">
             <div className="flex items-start justify-between mb-4">
               <DashboardHeader />
-              <SidebarTrigger
-                className="rotate-180"
-                variant="ghost"
-                size="icon"
-              />
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <SidebarTrigger
+                  className="rotate-180 h-9 w-9"
+                  variant="ghost"
+                  size="icon"
+                />
+              </div>
             </div>
             <HealthStatistics />
             <MedicalRecords />
