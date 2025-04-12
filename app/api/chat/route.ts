@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
         { error: "Invalid request body" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       console.error("OPENROUTER_API_KEY not configured");
       return NextResponse.json(
         { error: "API configuration error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
           model: "google/gemini-2.0-flash-exp:free",
           messages: messages,
         }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       console.error("OpenRouter API error:", response.status, errorText);
       return NextResponse.json(
         { error: `API error: ${response.status}` },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     console.error("Error in chat API route:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

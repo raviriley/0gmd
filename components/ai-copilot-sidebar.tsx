@@ -297,7 +297,7 @@ export function AICopilotSidebar() {
                 onClick={(e) => {
                   e.stopPropagation();
                   const fileInput = document.querySelector(
-                    'input[type="file"]'
+                    'input[type="file"]',
                   ) as HTMLInputElement;
                   if (fileInput) fileInput.click();
                 }}
