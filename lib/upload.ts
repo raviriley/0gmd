@@ -5,9 +5,7 @@ import { ethers } from "ethers";
  * Creates a Blob object from a File
  */
 export async function createBlobFromFile(file: File): Promise<Blob> {
-  const arrayBuffer = await file.arrayBuffer();
-  const uint8Array = new Uint8Array(arrayBuffer);
-  return new Blob(uint8Array);
+  return new Blob(file);
 }
 
 /**
@@ -17,7 +15,7 @@ export async function uploadToStorage(
   blob: Blob,
   storageRpc: string,
   l1Rpc: string,
-  signer: ethers.Signer,
+  signer: ethers.Wallet,
 ): Promise<[boolean, Error | null]> {
   try {
     const indexer = new Indexer(storageRpc);
@@ -44,7 +42,7 @@ export async function uploadToStorage(
 export function getSignerFromPrivateKey(
   privateKey: string,
   provider: ethers.JsonRpcProvider,
-): ethers.Signer {
+): ethers.Wallet {
   return new ethers.Wallet(privateKey, provider);
 }
 

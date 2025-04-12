@@ -36,6 +36,7 @@ export function FileUploader() {
       const result = await uploadFile(formData);
       setUploadStatus(result);
     } catch (error) {
+      console.error(error);
       setUploadStatus({
         success: false,
         error: "An error occurred during upload",
