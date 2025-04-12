@@ -112,7 +112,7 @@ export function AICopilotSidebar() {
 
         <SidebarContent>
           <ScrollArea className="h-[calc(100vh-8rem)]">
-            <div className="flex flex-col gap-4 p-4">
+            <div className="flex flex-col gap-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
