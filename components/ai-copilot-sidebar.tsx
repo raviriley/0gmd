@@ -8,8 +8,9 @@ import {
   SidebarContent,
   SidebarHeader,
   SidebarFooter,
+  SidebarRail,
 } from "@/components/ui/sidebar";
-import { Bot, Send, User, Sparkles, PanelRight } from "lucide-react";
+import { Bot, Send, User, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -68,17 +69,15 @@ export function AICopilotSidebar() {
   };
 
   return (
-    <Sidebar side="right" className="border-l border-gray-200 w-[350px]">
+    <Sidebar
+      side="right"
+      // collapsible="none"
+      className="border-l border-gray-200"
+    >
       <SidebarHeader className="p-4 border-b">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-500" />
-            <h2 className="font-semibold">Health Assistant</h2>
-          </div>
-          <Button variant="ghost" size="icon">
-            <PanelRight className="h-4 w-4" />
-            <span className="sr-only">Toggle sidebar</span>
-          </Button>
+        <div className="flex items-center">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <h2 className="font-semibold ml-2">Health Assistant</h2>
         </div>
       </SidebarHeader>
 
@@ -88,11 +87,11 @@ export function AICopilotSidebar() {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex w-full gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 {message.role === "assistant" && (
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-blue-100 text-blue-500">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
                       <Bot className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
@@ -101,8 +100,8 @@ export function AICopilotSidebar() {
                 <div
                   className={`p-3 rounded-lg max-w-[80%] ${
                     message.role === "user"
-                      ? "bg-blue-500 text-white rounded-tr-none"
-                      : "bg-gray-100 text-gray-800 rounded-tl-none"
+                      ? "bg-primary text-primary-foreground rounded-tr-none"
+                      : "bg-secondary text-secondary-foreground rounded-tl-none"
                   }`}
                 >
                   {message.content}
@@ -114,7 +113,7 @@ export function AICopilotSidebar() {
                       src="/placeholder.svg?height=32&width=32"
                       alt="User"
                     />
-                    <AvatarFallback className="bg-gray-200">
+                    <AvatarFallback>
                       <User className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
@@ -148,6 +147,7 @@ export function AICopilotSidebar() {
           to provide personalized information.
         </div>
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }
