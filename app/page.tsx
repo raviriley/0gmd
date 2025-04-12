@@ -2,21 +2,32 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { HealthStatistics } from "@/components/health-statistics";
 import { MedicalRecords } from "@/components/medical-records";
 import { AICopilotSidebar } from "@/components/ai-copilot-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 export default function Dashboard() {
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen bg-gray-50">
+      <SidebarInset>
         <main className="flex-1">
-          <div className="container mx-auto px-4 py-6">
-            <DashboardHeader />
+          <div className="container mx-auto px-4 pb-6 pt-3">
+            <div className="flex items-start justify-between mb-4">
+              <DashboardHeader />
+              <SidebarTrigger
+                className="rotate-180"
+                variant="ghost"
+                size="icon"
+              />
+            </div>
             <HealthStatistics />
             <MedicalRecords />
           </div>
         </main>
-        <AICopilotSidebar />
-      </div>
+      </SidebarInset>
+      <AICopilotSidebar />
     </SidebarProvider>
   );
 }
