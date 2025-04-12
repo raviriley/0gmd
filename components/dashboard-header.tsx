@@ -15,10 +15,12 @@ export function DashboardHeader() {
             <AvatarFallback>JD</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-primary-background">
               Welcome, Jane Doe
             </h1>
-            <p className="text-gray-500">Last check-up: March 15, 2025</p>
+            <p className="text-muted-foreground">
+              Last check-up: March 15, 2025
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">

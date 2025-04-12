@@ -18,9 +18,7 @@ import {
 export function HealthStatistics() {
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        Health Statistics
-      </h2>
+      <h2 className="text-xl font-semibold mb-4">Health Statistics</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
           title="Heart Rate"

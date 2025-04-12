@@ -69,11 +69,7 @@ export function AICopilotSidebar() {
   };
 
   return (
-    <Sidebar
-      side="right"
-      // collapsible="none"
-      className="border-l border-gray-200"
-    >
+    <Sidebar side="right" className="border-l">
       <SidebarHeader className="p-4 border-b">
         <div className="flex items-center">
           <Sparkles className="h-5 w-5 text-primary" />

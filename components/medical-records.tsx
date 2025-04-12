@@ -105,14 +105,14 @@ function RecordItem({ record }: RecordItemProps) {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50">
+    <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-secondary">
       <div className="flex items-center gap-3">
         <div className="p-2 bg-gray-100 rounded-full">
           <FileText className="h-5 w-5 text-gray-600" />
         </div>
         <div>
-          <h3 className="font-medium text-gray-900">{record.title}</h3>
-          <div className="flex gap-3 text-sm text-gray-500">
+          <h3 className="font-medium">{record.title}</h3>
+          <div className="flex gap-3 text-sm text-gray-500 dark:text-gray-400">
             <span>{record.date}</span>
             <span>•</span>
             <span>{record.provider}</span>
