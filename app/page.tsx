@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { DoctorRecordRequests } from "@/components/doctor-record-requests";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileUploadDialog } from "@/components/file-upload-dialog";
+import { ConnectWalletButton } from "@/components/connect-wallet-button";
 
 export default function Dashboard() {
   return (
@@ -25,6 +26,7 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <FileUploadDialog />
+              <ConnectWalletButton />
               <ThemeToggle />
             </div>
           </div>
