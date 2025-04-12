@@ -4,8 +4,8 @@ import { Bell, Calendar, Settings } from "lucide-react";
 
 export function DashboardHeader() {
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between">
+    <div className="mb-4">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
             <AvatarImage
