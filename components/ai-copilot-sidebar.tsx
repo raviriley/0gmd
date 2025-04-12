@@ -73,7 +73,7 @@ export function AICopilotSidebar() {
       <SidebarHeader className="p-4 border-b">
         <div className="flex items-center">
           <Sparkles className="h-5 w-5 text-primary" />
-          <h2 className="font-semibold ml-2">Health Assistant</h2>
+          <h2 className="font-semibold ml-2">0G MD</h2>
         </div>
       </SidebarHeader>
 
@@ -139,8 +139,8 @@ export function AICopilotSidebar() {
           </Button>
         </div>
         <div className="mt-2 text-xs text-gray-500 text-center">
-          Your health assistant is powered by AI and uses your medical records
-          to provide personalized information.
+          Your health assistant uses your <strong>encrypted</strong> medical
+          records to provide personalized information.
         </div>
       </SidebarFooter>
       <SidebarRail />
