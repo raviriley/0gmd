@@ -14,7 +14,7 @@ const queryClient = new QueryClient();
 const config = getDefaultConfig({
   appName: "0G MD",
   projectId: "test",
-  chains: [zeroG as any],
+  chains: [zeroG],
 });
 
 export function RainbowKitProviderWrapper({
