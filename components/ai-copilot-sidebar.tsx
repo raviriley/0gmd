@@ -120,7 +120,7 @@ export function AICopilotSidebar() {
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t">
+      <SidebarFooter className="p-0 border-t">
         <div className="flex gap-2">
           <Input
             placeholder="Ask about your health records..."
@@ -131,7 +131,7 @@ export function AICopilotSidebar() {
                 handleSendMessage();
               }
             }}
-            className="flex-1"
+            className="flex-1 shadow shadow-2xl hover:shadow-none hover:border-primary"
           />
           <Button onClick={handleSendMessage} size="icon">
             <Send className="h-4 w-4" />
