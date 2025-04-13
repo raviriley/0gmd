@@ -110,7 +110,7 @@ function RecordItem({ record }: RecordItemProps) {
   };
 
   const [loadingToastId, setLoadingToastId] = useState<string | number | null>(
-    null
+    null,
   );
 
   const { signMessage, isPending } = useSignMessage({
