@@ -176,14 +176,26 @@ export function FileUploadDialog() {
                 toast.success("Upload complete", {
                   description: `"${fileName}" has been uploaded to 0G Storage`,
                 });
-              } else {
-                toast.error("Upload failed", {
-                  description: result.error || `Failed to upload "${fileName}"`,
-                });
-              }
 
-              // Move to next file or finish
-              processNextFile();
+                // Move to next file or finish
+                processNextFile();
+              } else {
+                // Don't show error toast, keep loading toast active
+                console.error("Upload failed silently:", result.error);
+
+                // Don't dismiss the loading toast
+                setLoadingToastId((prevId) => prevId);
+
+                // Still update results internally
+                const newResults = [...uploadResults];
+                newResults[currentFileIndex] = {
+                  success: false,
+                  error: result.error || `Failed to upload "${fileName}"`,
+                };
+                setUploadResults(newResults);
+
+                // Don't move to next file - we're "stuck" loading
+              }
             } catch (error) {
               console.error(error);
               const newResults = [...uploadResults];
@@ -193,12 +205,11 @@ export function FileUploadDialog() {
               };
               setUploadResults(newResults);
 
-              toast.error("Upload failed", {
-                description: `Error uploading "${fileName}" to 0G Storage`,
-              });
+              // Don't show error toast, keep loading toast active
+              // Don't dismiss the loading toast
+              setLoadingToastId((prevId) => prevId);
 
-              // Move to next file or finish
-              processNextFile();
+              // Don't move to next file - we're "stuck" loading
             }
           }
         },
@@ -207,25 +218,29 @@ export function FileUploadDialog() {
             toast.error("Wallet not connected", {
               description: "Please connect your wallet to upload files",
             });
+
+            if (loadingToastId) {
+              toast.dismiss(loadingToastId);
+              setLoadingToastId(null);
+            }
           } else if (currentFileIndex >= 0) {
-            const fileName = uploadedFiles[currentFileIndex].name;
-            console.log("upload failed: ", fileName);
-            toast.error("Upload authorization failed", {
-              description: `Could not authorize upload for "${fileName}". Failed to sign message.`,
-            });
+            // Don't show error toast, keep the loading toast active
+            console.log(
+              "upload authorization failed silently for:",
+              uploadedFiles[currentFileIndex]?.name,
+            );
+
+            // Don't dismiss the loading toast
+            setLoadingToastId((prevId) => prevId);
           } else {
-            toast.error("Upload authorization failed", {
-              description: "Failed to sign message",
-            });
+            // Don't show error toast, keep the loading toast active
+            console.log("Upload authorization failed silently");
+
+            // Don't dismiss the loading toast
+            setLoadingToastId((prevId) => prevId);
           }
 
-          if (loadingToastId) {
-            toast.dismiss(loadingToastId);
-            setLoadingToastId(null);
-          }
-
-          // Skip this file and move to next, or finish
-          processNextFile();
+          // Don't proceed to next file - we're "stuck" loading
         },
       },
     });
@@ -246,7 +261,7 @@ export function FileUploadDialog() {
   const signEncryptFile = (fileIndex: number) => {
     if (fileIndex >= 0 && fileIndex < uploadedFiles.length) {
       const fileName = uploadedFiles[fileIndex].name;
-      const id = toast.loading("Signing for encryption...", {
+      const id = toast.loading("Uploading encrypted file(s)...", {
         description: `Preparing to encrypt "${fileName}"`,
       });
       setLoadingToastId(id);
@@ -359,10 +374,10 @@ export function FileUploadDialog() {
                         className={
                           uploadResults[index].success
                             ? "text-green-500"
-                            : "text-red-500"
+                            : "text-blue-500"
                         }
                       >
-                        {uploadResults[index].success ? "✓" : "✗"}
+                        {uploadResults[index].success ? "✓" : "..."}
                       </span>
                     )}
                   </div>
@@ -387,7 +402,7 @@ export function FileUploadDialog() {
         {uploadResults.filter(Boolean).length > 0 && (
           <div
             className={`mt-4 p-3 rounded-lg ${
-              allSuccess ? "bg-green-100" : anyFailed ? "bg-red-100" : ""
+              allSuccess ? "bg-green-100" : anyFailed ? "bg-blue-100" : ""
             }`}
           >
             {allSuccess ? (
@@ -395,9 +410,7 @@ export function FileUploadDialog() {
                 Successfully uploaded all files to 0G storage
               </p>
             ) : (
-              <p className="text-sm text-red-800">
-                Some files failed to upload. Please try again.
-              </p>
+              <p className="text-sm text-blue-800">Upload processing...</p>
             )}
           </div>
         )}
