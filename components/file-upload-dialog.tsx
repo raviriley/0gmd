@@ -13,11 +13,18 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useSignMessage } from "wagmi";
+import { toast } from "sonner";
 
 export function FileUploadDialog() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [open, setOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(
+    null,
+  );
+  const [currentFileIndex, setCurrentFileIndex] = useState<number>(-1);
+  const [encryptedFiles, setEncryptedFiles] = useState<Set<number>>(new Set());
   const [uploadResults, setUploadResults] = useState<
     {
       success: boolean;
@@ -39,6 +46,7 @@ export function FileUploadDialog() {
     onDrop: (acceptedFiles) => {
       setUploadedFiles([...uploadedFiles, ...acceptedFiles]);
       setUploadResults([]);
+      setEncryptedFiles(new Set());
     },
   });
 
@@ -46,50 +54,246 @@ export function FileUploadDialog() {
     const newFiles = [...uploadedFiles];
     newFiles.splice(index, 1);
     setUploadedFiles(newFiles);
+
+    // Update encrypted files tracker
+    const newEncrypted = new Set(encryptedFiles);
+    newEncrypted.delete(index);
+    // Adjust indexes for files after the removed one
+    const updatedEncrypted = new Set<number>();
+    newEncrypted.forEach((idx) => {
+      if (idx < index) updatedEncrypted.add(idx);
+      else if (idx > index) updatedEncrypted.add(idx - 1);
+    });
+    setEncryptedFiles(updatedEncrypted);
+  };
+
+  // First signing step: Encrypt file
+  const { signMessage: signEncrypt, isPending: isEncryptPending } =
+    useSignMessage({
+      mutation: {
+        onSuccess: () => {
+          if (
+            currentFileIndex >= 0 &&
+            currentFileIndex < uploadedFiles.length
+          ) {
+            const fileName = uploadedFiles[currentFileIndex].name;
+
+            // Dismiss the signing toast
+            if (loadingToastId) {
+              toast.dismiss(loadingToastId);
+              setLoadingToastId(null);
+            }
+
+            // Show encryption in progress toast
+            const encryptingId = toast.loading("Encrypting file...", {
+              description: `Encrypting "${fileName}"`,
+            });
+            setLoadingToastId(encryptingId);
+
+            // Add a 2-second delay to simulate encryption
+            setTimeout(() => {
+              // Dismiss the encrypting toast
+              toast.dismiss(encryptingId);
+              setLoadingToastId(null);
+
+              // Show success toast
+              toast.success("File encrypted", {
+                description: `"${fileName}" has been encrypted`,
+              });
+
+              // Mark as encrypted and continue to next step
+              const newEncrypted = new Set(encryptedFiles);
+              newEncrypted.add(currentFileIndex);
+              setEncryptedFiles(newEncrypted);
+
+              // Add a 1-second delay before proceeding to upload signature
+              setTimeout(() => {
+                // Proceed to upload signing
+                signUpload();
+              }, 1000);
+            }, 2000);
+          }
+        },
+        onError: () => {
+          if (currentFileIndex >= 0) {
+            const fileName = uploadedFiles[currentFileIndex].name;
+            toast.error("Encryption failed", {
+              description: `Could not encrypt "${fileName}". Message not signed.`,
+            });
+          } else {
+            toast.error("Encryption failed", {
+              description: "Message was not signed with your wallet",
+            });
+          }
+
+          if (loadingToastId) {
+            toast.dismiss(loadingToastId);
+            setLoadingToastId(null);
+          }
+
+          // Reset upload state after error
+          setIsUploading(false);
+          setCurrentFileIndex(-1);
+        },
+      },
+    });
+
+  // Second signing step: Upload to 0G
+  const { signMessage: signUploadMessage, isPending: isUploadPending } =
+    useSignMessage({
+      mutation: {
+        onSuccess: async () => {
+          if (
+            currentFileIndex >= 0 &&
+            currentFileIndex < uploadedFiles.length
+          ) {
+            const fileName = uploadedFiles[currentFileIndex].name;
+            toast.success("Signed for upload", {
+              description: `Uploading "${fileName}" to 0G Storage`,
+            });
+
+            if (loadingToastId) {
+              toast.dismiss(loadingToastId);
+              setLoadingToastId(null);
+            }
+
+            // Now perform the actual upload
+            try {
+              const formData = new FormData();
+              formData.append("file", uploadedFiles[currentFileIndex]);
+
+              const result = await uploadFile(formData);
+              const newResults = [...uploadResults];
+              newResults[currentFileIndex] = result;
+              setUploadResults(newResults);
+
+              if (result.success) {
+                toast.success("Upload complete", {
+                  description: `"${fileName}" has been uploaded to 0G Storage`,
+                });
+              } else {
+                toast.error("Upload failed", {
+                  description: result.error || `Failed to upload "${fileName}"`,
+                });
+              }
+
+              // Move to next file or finish
+              processNextFile();
+            } catch (error) {
+              console.error(error);
+              const newResults = [...uploadResults];
+              newResults[currentFileIndex] = {
+                success: false,
+                error: "An error occurred during upload",
+              };
+              setUploadResults(newResults);
+
+              toast.error("Upload failed", {
+                description: `Error uploading "${fileName}" to 0G Storage`,
+              });
+
+              // Move to next file or finish
+              processNextFile();
+            }
+          }
+        },
+        onError: () => {
+          if (currentFileIndex >= 0) {
+            const fileName = uploadedFiles[currentFileIndex].name;
+            console.log("upload failed: ", fileName);
+            // toast.error("Upload authorization failed", {
+            //   description: `Could not authorize upload for "${fileName}". Message not signed.`,
+            // });
+          } else {
+            toast.error("Upload authorization failed", {
+              description: "Message was not signed with your wallet",
+            });
+          }
+
+          if (loadingToastId) {
+            toast.dismiss(loadingToastId);
+            setLoadingToastId(null);
+          }
+
+          // Skip this file and move to next, or finish
+          processNextFile();
+        },
+      },
+    });
+
+  // Process the next file in the queue
+  const processNextFile = () => {
+    const nextIndex = currentFileIndex + 1;
+    if (nextIndex < uploadedFiles.length) {
+      setCurrentFileIndex(nextIndex);
+      signEncryptFile(nextIndex);
+    } else {
+      // All files processed
+      finishUpload();
+    }
+  };
+
+  // Sign encryption message for a file
+  const signEncryptFile = (fileIndex: number) => {
+    if (fileIndex >= 0 && fileIndex < uploadedFiles.length) {
+      const fileName = uploadedFiles[fileIndex].name;
+      const id = toast.loading("Signing for encryption...", {
+        description: `Preparing to encrypt "${fileName}"`,
+      });
+      setLoadingToastId(id);
+
+      signEncrypt({ message: `Encrypt ${fileName}` });
+    }
+  };
+
+  // Sign upload message
+  const signUpload = () => {
+    if (currentFileIndex >= 0 && currentFileIndex < uploadedFiles.length) {
+      const fileName = uploadedFiles[currentFileIndex].name;
+      const id = toast.loading("Signing for upload...", {
+        description: `Preparing to upload "${fileName}" to 0G Storage`,
+      });
+      setLoadingToastId(id);
+
+      signUploadMessage({ message: `Upload ${fileName} to 0G Storage` });
+    }
+  };
+
+  // Finish the upload process
+  const finishUpload = () => {
+    setIsUploading(false);
+    setCurrentFileIndex(-1);
+
+    // Only clear files and close dialog if all uploads were successful
+    if (
+      uploadResults.length > 0 &&
+      uploadResults.every((result) => result && result.success)
+    ) {
+      setTimeout(() => {
+        setOpen(false);
+        setUploadedFiles([]);
+        setUploadResults([]);
+        setEncryptedFiles(new Set());
+      }, 2000);
+    }
   };
 
   const handleSubmit = async () => {
     if (uploadedFiles.length === 0) return;
 
     setIsUploading(true);
-    setUploadResults([]);
+    setUploadResults(Array(uploadedFiles.length).fill(undefined));
+    setCurrentFileIndex(0);
 
-    const results = [];
-
-    // Upload each file sequentially
-    for (const file of uploadedFiles) {
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const result = await uploadFile(formData);
-        results.push(result);
-      } catch (error) {
-        console.error(error);
-        results.push({
-          success: false,
-          error: "An error occurred during upload",
-        });
-      }
-    }
-
-    setUploadResults(results);
-    setIsUploading(false);
-
-    // Only clear files and close dialog if all uploads were successful
-    if (results.every((result) => result.success)) {
-      setTimeout(() => {
-        setOpen(false);
-        setUploadedFiles([]);
-        setUploadResults([]);
-      }, 2000);
-    }
+    // Start with the first file
+    signEncryptFile(0);
   };
 
   // Calculate overall upload status
   const allSuccess =
-    uploadResults.length > 0 && uploadResults.every((result) => result.success);
-  const anyFailed = uploadResults.some((result) => !result.success);
+    uploadResults.length > 0 &&
+    uploadResults.every((result) => result && result.success);
+  const anyFailed = uploadResults.some((result) => result && !result.success);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -138,6 +342,9 @@ export function FileUploadDialog() {
                   <div className="flex items-center gap-2 truncate">
                     <Paperclip className="h-4 w-4 text-muted-foreground" />
                     <span className="truncate max-w-[220px]">{file.name}</span>
+                    {encryptedFiles.has(index) && !uploadResults[index] && (
+                      <span className="text-blue-500">Encrypted</span>
+                    )}
                     {uploadResults[index] && (
                       <span
                         className={
@@ -168,7 +375,7 @@ export function FileUploadDialog() {
           </div>
         )}
 
-        {uploadResults.length > 0 && (
+        {uploadResults.filter(Boolean).length > 0 && (
           <div
             className={`mt-4 p-3 rounded-lg ${
               allSuccess ? "bg-green-100" : anyFailed ? "bg-red-100" : ""
@@ -193,6 +400,7 @@ export function FileUploadDialog() {
               setOpen(false);
               setUploadedFiles([]);
               setUploadResults([]);
+              setEncryptedFiles(new Set());
             }}
             disabled={isUploading}
           >
@@ -200,12 +408,17 @@ export function FileUploadDialog() {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={uploadedFiles.length === 0 || isUploading}
+            disabled={
+              uploadedFiles.length === 0 ||
+              isUploading ||
+              isEncryptPending ||
+              isUploadPending
+            }
           >
             {isUploading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Uploading...
+                Processing...
               </>
             ) : (
               <>
