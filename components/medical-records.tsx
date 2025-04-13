@@ -110,7 +110,7 @@ function RecordItem({ record }: RecordItemProps) {
   };
 
   const [loadingToastId, setLoadingToastId] = useState<string | number | null>(
-    null,
+    null
   );
 
   const { signMessage, isPending } = useSignMessage({
@@ -122,6 +122,18 @@ function RecordItem({ record }: RecordItemProps) {
         if (loadingToastId) {
           toast.dismiss(loadingToastId);
         }
+
+        // Generate and download mock PDF file
+        const fileName = record.title.replace(/\s+/g, "_") + ".pdf";
+        const blob = new Blob([""], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
       },
       onError: () => {
         toast.error("Authentication failed", {
