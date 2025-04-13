@@ -1,7 +1,5 @@
 import { DoctorHeader } from "@/components/doctor-header";
 import { PatientList } from "@/components/patient-list";
-import { AICopilotSidebar } from "@/components/ai-copilot-sidebar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function DoctorDashboard() {
