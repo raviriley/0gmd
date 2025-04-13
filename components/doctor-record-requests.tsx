@@ -1,9 +1,14 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Filter, Search, Clock, Check, X, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSignMessage } from "wagmi";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function DoctorRecordRequests() {
   return (
@@ -91,6 +96,11 @@ interface RequestItemProps {
 }
 
 function RequestItem({ request }: RequestItemProps) {
+  const [status, setStatus] = useState(request.status);
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(
+    null,
+  );
+
   const priorityColors = {
     high: "bg-red-100 text-red-800",
     medium: "bg-yellow-100 text-yellow-800",
@@ -101,6 +111,78 @@ function RequestItem({ request }: RequestItemProps) {
     pending: <Clock className="h-4 w-4 text-yellow-500" />,
     approved: <Check className="h-4 w-4 text-green-500" />,
     denied: <X className="h-4 w-4 text-red-500" />,
+  };
+
+  const { signMessage: signApprove, isPending: isApprovePending } =
+    useSignMessage({
+      mutation: {
+        onSuccess: () => {
+          toast.success("Request approved", {
+            description: `You've approved Dr. ${request.doctorName}'s request for ${request.requestType}`,
+          });
+          if (loadingToastId) {
+            toast.dismiss(loadingToastId);
+          }
+          setStatus("approved");
+        },
+        onError: () => {
+          toast.error("Approval failed", {
+            description: "Message was not signed with your wallet",
+          });
+          if (loadingToastId) {
+            toast.dismiss(loadingToastId);
+          }
+        },
+      },
+    });
+
+  const { signMessage: signDeny, isPending: isDenyPending } = useSignMessage({
+    mutation: {
+      onSuccess: () => {
+        toast.success("Request denied", {
+          description: `You've denied Dr. ${request.doctorName}'s request for ${request.requestType}`,
+        });
+        if (loadingToastId) {
+          toast.dismiss(loadingToastId);
+        }
+        setStatus("denied");
+      },
+      onError: () => {
+        toast.error("Denial failed", {
+          description: "Message was not signed with your wallet",
+        });
+        if (loadingToastId) {
+          toast.dismiss(loadingToastId);
+        }
+      },
+    },
+  });
+
+  const handleApprove = () => {
+    const id = toast.loading("Signing approval...", {
+      description: `Signing approval for Dr. ${request.doctorName}'s request`,
+    });
+    setLoadingToastId(id);
+    signApprove({
+      message: `Approve access request: Dr. ${request.doctorName} (${request.doctorId}) - ${request.requestType}`,
+    });
+  };
+
+  const handleDeny = () => {
+    const id = toast.loading("Signing denial...", {
+      description: `Signing denial for Dr. ${request.doctorName}'s request`,
+    });
+    setLoadingToastId(id);
+    signDeny({
+      message: `Deny access request: Dr. ${request.doctorName} (${request.doctorId}) - ${request.requestType}`,
+    });
+  };
+
+  const handleReprocess = () => {
+    setStatus("pending");
+    toast("Request reset", {
+      description: `Dr. ${request.doctorName}'s request has been reset to pending`,
+    });
   };
 
   return (
@@ -134,22 +216,38 @@ function RequestItem({ request }: RequestItemProps) {
           {request.priority}
         </span>
         <div className="flex items-center gap-1">
-          {request.status === "pending" ? (
+          {status === "pending" ? (
             <>
-              <Button variant="outline" size="sm" className="h-8">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8"
+                onClick={handleDeny}
+                disabled={isDenyPending || isApprovePending}
+              >
                 <X className="h-4 w-4 mr-1" />
                 Deny
               </Button>
-              <Button size="sm" className="h-8">
+              <Button
+                size="sm"
+                className="h-8"
+                onClick={handleApprove}
+                disabled={isApprovePending || isDenyPending}
+              >
                 <Check className="h-4 w-4 mr-1" />
                 Approve
               </Button>
             </>
           ) : (
             <div className="flex items-center gap-2">
-              {statusIcons[request.status]}
-              <span className="text-sm capitalize">{request.status}</span>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              {statusIcons[status]}
+              <span className="text-sm capitalize">{status}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleReprocess}
+              >
                 <RefreshCw className="h-4 w-4" />
                 <span className="sr-only">Reprocess</span>
               </Button>
