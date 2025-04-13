@@ -1,8 +1,13 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Download, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useSignMessage } from "wagmi";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function MedicalRecords() {
   return (
@@ -104,6 +109,39 @@ function RecordItem({ record }: RecordItemProps) {
     archived: "bg-gray-100 text-gray-800",
   };
 
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(
+    null,
+  );
+
+  const { signMessage, isPending } = useSignMessage({
+    mutation: {
+      onSuccess: () => {
+        toast.success("Record authenticated", {
+          description: `Successfully signed for "${record.title}" access`,
+        });
+        if (loadingToastId) {
+          toast.dismiss(loadingToastId);
+        }
+      },
+      onError: () => {
+        toast.error("Authentication failed", {
+          description: "Message was not signed with your wallet",
+        });
+        if (loadingToastId) {
+          toast.dismiss(loadingToastId);
+        }
+      },
+    },
+  });
+
+  const handleDownload = () => {
+    const id = toast.loading("Signing message...", {
+      description: `Signing message for "${record.title}" access`,
+    });
+    setLoadingToastId(id);
+    signMessage({ message: `Decrypt & Sign ${record.title}` });
+  };
+
   return (
     <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-secondary">
       <div className="flex items-center gap-3">
@@ -127,7 +165,12 @@ function RecordItem({ record }: RecordItemProps) {
         >
           {record.status}
         </span>
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDownload}
+          disabled={isPending}
+        >
           <Download className="h-4 w-4" />
           <span className="sr-only">Download</span>
         </Button>
