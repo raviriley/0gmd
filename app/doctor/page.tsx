@@ -6,21 +6,18 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function DoctorDashboard() {
   return (
-    <SidebarProvider defaultOpen={true}>
-      <AICopilotSidebar />
-      <SidebarInset>
-        <header className="flex pt-2 shrink-0 items-center border-b">
-          <div className="container flex items-start justify-between px-4">
-            <div className="flex items-center gap-1">
-              <DoctorHeader />
-            </div>
-            <ThemeToggle />
+    <div className="py-4">
+      <header className="flex pt-2 items-center border-b px-4">
+        <div className="container flex items-start justify-between max-w-none">
+          <div className="flex items-center gap-1">
+            <DoctorHeader />
           </div>
-        </header>
-        <div className="container px-4 pb-6 pt-3">
-          <PatientList />
+          <ThemeToggle />
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+      </header>
+      <div className="container p-2 max-w-none">
+        <PatientList />
+      </div>
+    </div>
   );
 }
