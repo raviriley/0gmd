@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { RainbowKitProviderWrapper } from "@/lib/rainbowkit-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <RainbowKitProviderWrapper>{children}</RainbowKitProviderWrapper>
+          <Toaster richColors />
         </ThemeProvider>
       </body>
     </html>
