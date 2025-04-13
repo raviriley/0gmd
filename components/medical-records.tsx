@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Download, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useSignMessage } from "wagmi";
+import { useSignMessage, useAccount } from "wagmi";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -112,6 +112,7 @@ function RecordItem({ record }: RecordItemProps) {
   const [loadingToastId, setLoadingToastId] = useState<string | number | null>(
     null,
   );
+  const { isConnected } = useAccount();
 
   const { signMessage, isPending } = useSignMessage({
     mutation: {
@@ -136,9 +137,15 @@ function RecordItem({ record }: RecordItemProps) {
         URL.revokeObjectURL(url);
       },
       onError: () => {
-        toast.error("Authentication failed", {
-          description: "Message was not signed with your wallet",
-        });
+        if (!isConnected) {
+          toast.error("Wallet not connected", {
+            description: "Please connect your wallet to access medical records",
+          });
+        } else {
+          toast.error("Authentication failed", {
+            description: "Failed to sign authentication message",
+          });
+        }
         if (loadingToastId) {
           toast.dismiss(loadingToastId);
         }

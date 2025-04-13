@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -100,6 +101,7 @@ function RequestItem({ request }: RequestItemProps) {
   const [loadingToastId, setLoadingToastId] = useState<string | number | null>(
     null,
   );
+  const { isConnected } = useAccount();
 
   const priorityColors = {
     high: "bg-red-100 text-red-800",
@@ -126,9 +128,15 @@ function RequestItem({ request }: RequestItemProps) {
           setStatus("approved");
         },
         onError: () => {
-          toast.error("Approval failed", {
-            description: "Message was not signed with your wallet",
-          });
+          if (!isConnected) {
+            toast.error("Wallet not connected", {
+              description: "Please connect your wallet to approve requests",
+            });
+          } else {
+            toast.error("Approval failed", {
+              description: "Failed to sign approval message",
+            });
+          }
           if (loadingToastId) {
             toast.dismiss(loadingToastId);
           }
@@ -148,9 +156,15 @@ function RequestItem({ request }: RequestItemProps) {
         setStatus("denied");
       },
       onError: () => {
-        toast.error("Denial failed", {
-          description: "Message was not signed with your wallet",
-        });
+        if (!isConnected) {
+          toast.error("Wallet not connected", {
+            description: "Please connect your wallet to deny requests",
+          });
+        } else {
+          toast.error("Denial failed", {
+            description: "Failed to sign denial message",
+          });
+        }
         if (loadingToastId) {
           toast.dismiss(loadingToastId);
         }

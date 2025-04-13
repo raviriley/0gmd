@@ -13,7 +13,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useSignMessage } from "wagmi";
+import { useSignMessage, useAccount } from "wagmi";
 import { toast } from "sonner";
 
 export function FileUploadDialog() {
@@ -32,6 +32,7 @@ export function FileUploadDialog() {
       file?: { name: string; size: number; type: string };
     }[]
   >([]);
+  const { isConnected } = useAccount();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     multiple: true,
@@ -115,14 +116,18 @@ export function FileUploadDialog() {
           }
         },
         onError: () => {
-          if (currentFileIndex >= 0) {
+          if (!isConnected) {
+            toast.error("Wallet not connected", {
+              description: "Please connect your wallet to encrypt files",
+            });
+          } else if (currentFileIndex >= 0) {
             const fileName = uploadedFiles[currentFileIndex].name;
             toast.error("Encryption failed", {
-              description: `Could not encrypt "${fileName}". Message not signed.`,
+              description: `Could not encrypt "${fileName}". Failed to sign message.`,
             });
           } else {
             toast.error("Encryption failed", {
-              description: "Message was not signed with your wallet",
+              description: "Failed to sign message",
             });
           }
 
@@ -198,15 +203,19 @@ export function FileUploadDialog() {
           }
         },
         onError: () => {
-          if (currentFileIndex >= 0) {
+          if (!isConnected) {
+            toast.error("Wallet not connected", {
+              description: "Please connect your wallet to upload files",
+            });
+          } else if (currentFileIndex >= 0) {
             const fileName = uploadedFiles[currentFileIndex].name;
             console.log("upload failed: ", fileName);
-            // toast.error("Upload authorization failed", {
-            //   description: `Could not authorize upload for "${fileName}". Message not signed.`,
-            // });
+            toast.error("Upload authorization failed", {
+              description: `Could not authorize upload for "${fileName}". Failed to sign message.`,
+            });
           } else {
             toast.error("Upload authorization failed", {
-              description: "Message was not signed with your wallet",
+              description: "Failed to sign message",
             });
           }
 
