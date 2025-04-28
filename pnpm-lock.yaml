@@ -98,7 +98,7 @@ importers:
         version: 4.1.4
       '@types/node':
         specifier: ^20.17.30
-        version: 20.17.31
+        version: 20.17.32
       '@types/react':
         specifier: ^19.1.1
         version: 19.1.2
@@ -1156,8 +1156,8 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node@20.17.31':
-    resolution: {integrity: sha512-quODOCNXQAbNf1Q7V+fI8WyErOCh0D5Yd31vHnKu4GkSztGQ7rlltAaqXhHhLl33tlVyUXs2386MkANSwgDn6A==}
+  '@types/node@20.17.32':
+    resolution: {integrity: sha512-zeMXFn8zQ+UkjK4ws0RiOC9EWByyW1CcVmLe+2rQocXRsGEDxUCwPEIVgpsGcLHS/P8JkT0oa3839BRABS0oPw==}
 
   '@types/node@22.7.5':
     resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
@@ -4900,7 +4900,7 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@20.17.31':
+  '@types/node@20.17.32':
     dependencies:
       undici-types: 6.19.8
 
